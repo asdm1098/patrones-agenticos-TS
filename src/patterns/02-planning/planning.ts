@@ -239,7 +239,26 @@ async function withPlanning() {
     console.log('steps:'.red, steps);
 
     // Fase 2: Ejecutar paso por paso
+    const findings: string[] = [];
+    for (const [ index, step ] of steps.entries() ) {
+        console.log(`\n ===> Ejecutando Paso ${index+1}: ${step.goal}`.blue);
 
+        const { text } = await generateText({
+            model,
+            instructions: 
+                'Resuelve únicamenete el paso indicado. ' +
+                'No te adelantes a los siguientes pasos ni des el operativo final. ',
+            prompt: 
+                `Misión original: ${MISSION}\n\n` +
+                (findings.length)
+                ? `Resuelto hasta ahora: ${ findings.join('\n---------\n') } \n\n`
+                : '' + `Paso actual: ${ step.goal }`,
+            onStepEnd: tracer.onStepFinish,
+        })
+        findings.push(`[${step.goal}]\n ${text.trim()}`);
+    }
+
+    console.log({ findings });
 
     // Fase 3: Sintetizar e integrar todos los pasos anteriores =======
     const { text, } = await generateText({
