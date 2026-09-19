@@ -198,20 +198,69 @@ async function withoutPlanning() {
 // ---------------------------------------------------------------------------
 // TODO: 
 
+const planSchema = z.object({
+    steps: z.array(
+        z.object({
+            goal: z.string().describe('Que resuelve este paso, en una frase'),
+            reason: z
+                .string()
+                .describe('¿Por qué es necesario? y ¿Por qué va en esta posición?'),
+        })
+    ).min(2)
+    .max(5)
+    .describe('Pasos ordenados. Cada paso resuelve UNA sola cosa'),
+})
 
+async function buildPlan( tracer: ReturnType<typeof createTracer>) {
+    //output obliga a retornar en una respuesta estructurada, text el razonamiento solo.
+    const { output } = await generateText({
+        model,
+        output: Output.object({
+            schema: planSchema,
+        }),
+        prompt: MISSION,
+        instructions: 
+            'Eres un estratega. NO resuelvas el operativo todavia. ' +
+            'Responde en español. ' +
+            'Solo descomponlo en pasos ordenados, donde cada paso depende ' +
+            'del resultado del anterior.',
+        onStepEnd: tracer.onStepFinish,
+    })
+
+    return output.steps;
+}
+
+async function withPlanning() {
+    console.log('\n═══ B) CON PLANIFICACIÓN ═══\n'.blue);
+    const tracer = createTracer('Con-planificación');
+
+    // Fase 1: Planificación y construir el plan
+    const steps = await buildPlan(tracer);
+    console.log('steps:'.red, steps);
+
+    // Fase 2: Ejecutar paso por paso
+
+
+    // Fase 3: Sintetizar e integrar todos los pasos anteriores =======
+    const { text, } = await generateText({
+        model,
+        prompt: MISSION,
+        onStepEnd: tracer.onStepFinish,
+    })
+}
 
 // ---------------------------------------------------------------------------
 // MAIN
 // ---------------------------------------------------------------------------
 // TODO: 
 export async function planningMain() {
-    const a = await withoutPlanning();
-    // const b = await withPlanning();
+    // const a = await withoutPlanning();
+    const b = await withPlanning();
 
     console.log('\n═══ COMPARATIVA ═══\n'.blue);
     console.table({
-        'Sin planificación': a,
-        // 'Con planificación': b,
+        // 'Sin planificación': a,
+        'Con planificación': b,
     });
 
 
