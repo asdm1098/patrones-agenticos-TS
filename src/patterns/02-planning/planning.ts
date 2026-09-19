@@ -207,7 +207,7 @@ const planSchema = z.object({
                 .describe('¿Por qué es necesario? y ¿Por qué va en esta posición?'),
         })
     ).min(2)
-    .max(5)
+    .max(15)
     .describe('Pasos ordenados. Cada paso resuelve UNA sola cosa'),
 })
 
@@ -261,11 +261,19 @@ async function withPlanning() {
     console.log({ findings });
 
     // Fase 3: Sintetizar e integrar todos los pasos anteriores =======
-    const { text, } = await generateText({
+    const { text: finalPlan } = await generateText({
         model,
-        prompt: MISSION,
+        instructions: 
+            'Integra los resultados parciales en un operativo final.'+
+            'Se concreto: en el orden de intervención y de prioridades. ',
+        prompt: 
+            `MISIÓN: \n${MISSION} \n\n` +
+            `RESULTADOS PARCIALES: \n${findings.join('\n---------\n')}`,
         onStepEnd: tracer.onStepFinish,
-    })
+    });
+    
+    console.log('\n\n Operativo final:'.red, finalPlan.green);
+    return tracer.summary();
 }
 
 // ---------------------------------------------------------------------------
