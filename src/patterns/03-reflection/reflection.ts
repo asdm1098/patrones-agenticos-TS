@@ -114,7 +114,7 @@ async function withoutReflection() {
   });
   console.log(text.green);
   console.log('\n Auditoria: \n');
-  const score =  printAudit(auditBriefing(text));
+  const score = printAudit(auditBriefing(text));
 
   return { ...tracer.summary(), score }; // score
 }
@@ -123,15 +123,50 @@ async function withoutReflection() {
 // B) REFLEXIÓN INGENUA — el modelo se pregunta "¿está bien?"
 // ---------------------------------------------------------------------------
 
-// TODO: Schema
+const naiveVeredictSchema = z.object({
+  isGoodEnought: z.boolean().describe('¿El texto está listo para entregar?'),
+  comment: z.string().describe('Comentario breve sobre la calidad.'),
+
+})
 
 async function naiveReflection() {
   console.log('\n═══ B) REFLEXIÓN INGENUA (sin criterios) ═══\n'.blue);
   const tracer = createTracer('naive-reflection');
 
-  // TODO:
+  const { text: draft } = await generateText({
+    model,
+    prompt: TASK,
+    onStepEnd: tracer.onStepFinish,
+  });
 
-  return { ...tracer.summary() }; // score
+  // La auto-evaluacion: Sin rúbrica, sin criterios, sin nada
+  const { output: verdict } = await generateText({
+    model,
+    output: Output.object({
+      schema: naiveVeredictSchema,
+    }),
+    prompt: `TEXTO: \n ${draft}`,
+    onStepEnd: tracer.onStepFinish,
+  });
+  console.log('Informe:'.blue);
+  console.log(`Veredicto del modelo: 
+    ${
+      verdict.isGoodEnought ? '✅ Está listo'.green : '⚠️ Necesito cambios'.red
+    }`
+  );
+  console.log(`Comentario:  ${ verdict.comment }`);
+
+  console.log(`REALIDAD: (auditoria programática):`.blue);
+  const score = printAudit(auditBriefing(draft));
+
+  console.log(`Comentario:  ${ verdict.comment }`);
+
+  console.log(
+    '\n ⚠️ Compara el veredicto del modelo con la auditoría.'.yellow +
+      '\n  Esta brecha es la razón de ser de la rúbrica. \n'
+  );
+
+  return { ...tracer.summary(), score }; // score
 }
 
 // ---------------------------------------------------------------------------
@@ -155,14 +190,14 @@ async function reflectionWithRubric() {
 // ---------------------------------------------------------------------------
 
 export async function reflectionMain() {
-  const a = await withoutReflection();
-  //   const b = await naiveReflection();
+  // const a = await withoutReflection();
+  const b = await naiveReflection();
   //   const c = await reflectionWithRubric();
 
   console.log('\n═══ COMPARATIVA ═══\n'.blue);
   console.table({
-    'Sin reflexión': a,
-    //     'Reflexión ingenua': b,
+    // 'Sin reflexión': a,
+    'Reflexión ingenua': b,
     //     'Reflexión con rúbrica': c,
   });
 
