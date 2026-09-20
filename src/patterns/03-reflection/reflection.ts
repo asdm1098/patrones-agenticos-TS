@@ -174,8 +174,20 @@ async function naiveReflection() {
 // ---------------------------------------------------------------------------
 
 const criticSchema = z.object({
-  missing: z.array(z.string()).describe('Requisitos NO cumplidos, citando el número de cada uno y la descripción que no cumplió.'),
-  isComplete: z.boolean().describe('TRUE solo si TODOS los requisitos se cumplen.'),
+  missing: z
+    .array(
+      z.object({
+        requirementNumber: z.number(),
+        evidence: z.string().describe('Cita LITERAL del texto que lo cumple, o "ninguna"'),
+        passes: z.boolean()
+      })
+    )
+    .describe(
+      'Requisitos NO cumplidos, citando el número de cada uno y la descripción que no cumplió.'
+    ),
+  isComplete: z
+    .boolean()
+    .describe('TRUE solo si TODOS los requisitos se cumplen.'),
 })
 
 const MAX_ITERATIONS = 3;
@@ -205,7 +217,8 @@ async function reflectionWithRubric() {
         schema: criticSchema,
       }),
       prompt: `REQUISITOS: \n` +
-        REQUIREMENTS.map((r, i) => ` ${ i + 1 }. ${r}`).join('\n'),
+        REQUIREMENTS.map((r, i) => ` ${ i + 1 }. ${r}`).join('\n') +
+        `\n\nTEXTO A REVISAR: \n ${draft}`,
       instructions: 
         'Eres un revisor estricto. verifica el texto UNO POR UNO contra ' +
         'cada requisito de la lista. No asumas que algo esta cumplido: ' +
@@ -222,21 +235,20 @@ async function reflectionWithRubric() {
     }
 
     console.log(' Faltantes detectados: '.yellow);
-    critique.missing.forEach((item) => console.log(`    - ${item}`));
+    critique.missing.forEach((item) => console.log(`    - ${JSON.stringify(item)}`));
 
     // Reescribir en caso de problemas encontrados
     const { text: revised } = await generateText({
       model,
       instructions:
-        'Reescribe el briefing corrigiendo ÚNICAMENTE lospuntos señalados. ' +
+        'Reescribe el briefing corrigiendo ÚNICAMENTE los puntos señalados. ' +
         'Conserva lo que ya funcionaba. Respeta el límite de 120 palabras.',
       prompt:
         `BRIEFING ACTUAL:\n ${draft}\n\n` + 
         `CORRIGE ESTOS PUNTOS: \n ${critique.missing
-          .map((m) => `    - ${m}`)
+          .map((m) => `    - ${JSON.stringify(m)}`)
           .join('\n')}\n\n}` +
-          `CONTEXTO:\n ${VILLAIN_DOSSIER}`
-        ,
+          `CONTEXTO:\n ${VILLAIN_DOSSIER}`,
       onStepEnd: tracer.onStepFinish,
     });
 
