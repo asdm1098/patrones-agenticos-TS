@@ -107,9 +107,16 @@ async function withoutReflection() {
   console.log('\n═══ A) SIN REFLEXIÓN ═══\n'.blue);
   const tracer = createTracer('sin-reflexión');
 
-  // TODO:
+  const { text } = await generateText({
+    model,
+    prompt: TASK,
+    onStepEnd: tracer.onStepFinish,
+  });
+  console.log(text.green);
+  console.log('\n Auditoria: \n');
+  const score =  printAudit(auditBriefing(text));
 
-  return { ...tracer.summary() }; // score
+  return { ...tracer.summary(), score }; // score
 }
 
 // ---------------------------------------------------------------------------
@@ -123,7 +130,7 @@ async function naiveReflection() {
   const tracer = createTracer('naive-reflection');
 
   // TODO:
-      
+
   return { ...tracer.summary() }; // score
 }
 
@@ -149,22 +156,22 @@ async function reflectionWithRubric() {
 
 export async function reflectionMain() {
   const a = await withoutReflection();
-//   const b = await naiveReflection();
-//   const c = await reflectionWithRubric();
+  //   const b = await naiveReflection();
+  //   const c = await reflectionWithRubric();
 
   console.log('\n═══ COMPARATIVA ═══\n'.blue);
   console.table({
     'Sin reflexión': a,
-//     'Reflexión ingenua': b,
-//     'Reflexión con rúbrica': c,
+    //     'Reflexión ingenua': b,
+    //     'Reflexión con rúbrica': c,
   });
 
   console.log(
     '\n  La reflexión ingenua cuesta tokens extra y casi no mejora nada:\n' +
-      '  el modelo se aprueba a sí mismo.\n\n' +
-      '  Reflexionar no sirve por reflexionar. Sirve cuando hay criterios\n' +
-      '  concretos contra los que comparar.\n\n' +
-      '  Y aun así, el revisor sigue siendo el mismo modelo que escribió.\n' +
-      '  Separar los roles en dos agentes es el patrón Evaluator-Optimizer.\n',
+    '  el modelo se aprueba a sí mismo.\n\n' +
+    '  Reflexionar no sirve por reflexionar. Sirve cuando hay criterios\n' +
+    '  concretos contra los que comparar.\n\n' +
+    '  Y aun así, el revisor sigue siendo el mismo modelo que escribió.\n' +
+    '  Separar los roles en dos agentes es el patrón Evaluator-Optimizer.\n',
   );
 }
