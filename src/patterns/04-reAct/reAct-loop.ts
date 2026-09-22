@@ -131,10 +131,22 @@ async function withoutReAct() {
 
   const anaRecord = EMPLOYEES.find((e) => e.id === 'EMP-1')!;
 
- // TODO:
+ const { text } = await generateText({
+    model,
+    tools: { getEmployee },
+    instructions: 
+        'Eres un asistente de finanzas. Responde con los datos disponibles' +
+        'Responde en español.' +
+        'Si no puedes encontrar el aprobador, responde con "No se puede aprobar el gasto".',
+    prompt: 
+        `${REQUEST}\n\n` + 
+        `DATO DISPONIBLE: ${JSON.stringify(anaRecord, null, 2)}`,
+    onStepEnd: tracer.onStepFinish,
+    // reasoning: 'high',
+  });
 
 
-//   console.log('\n Respuesta:\n'.blue, text.green);
+  console.log('\n Respuesta:\n'.blue, text.green);
 
   console.log(
     (
