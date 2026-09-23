@@ -165,8 +165,9 @@ async function updateAnnouncement(
         model,
         instructions: WRITER_INSTRUCTIONS,
         prompt: `ANUNCIO ACTUAL: \n---${text}---` +
-            `\nPROBLEMA: \n${feedback} ---`,
-        // TODO: prevenir el degradado eventualmente
+            `\nPROBLEMA: \n${feedback} ---` + 
+            //prevenir el degradado eventualmente
+            `\n\nPrompt original: ${ BRIEF } ---`,
         onStepEnd: tracer.onStepFinish
     });
 
