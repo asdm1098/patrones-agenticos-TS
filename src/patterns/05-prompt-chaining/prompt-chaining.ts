@@ -36,27 +36,27 @@ const MAX_CHARS = 280;
 const MAX_RETRIES = 3;
 
 const COURSE = {
-  title: 'Patrones de diseño agéntico: Respuestas efectivas a desafíos',
-  hours: 18,
-  priceUSD: 34.99,
-  url: 'https://cursos.devtalles.com/cursos/patrones-diseno-agentico',
+    title: 'Patrones de diseño agéntico: Respuestas efectivas a desafíos',
+    hours: 18,
+    priceUSD: 34.99,
+    url: 'https://cursos.devtalles.com/cursos/patrones-diseno-agentico',
 };
 
 const BRIEF =
-  `Escribe el anuncio de lanzamiento de un curso para publicarlo en X.\n\n` +
-  `CURSO: ${COURSE.title}\n` +
-  `DURACIÓN: ${COURSE.hours} horas\n` +
-  `PRECIO: ${COURSE.priceUSD} USD\n` +
-  `ENLACE: ${COURSE.url}\n\n` +
-  `REQUISITOS:\n` +
-  `  - Máximo ${MAX_CHARS} caracteres, contando espacios y el enlace.\n` +
-  // `  - Trata de usar todo el espacio disponible.\n` +
-  `  - Usar al menos ${MAX_CHARS - 40} caracteres.\n` +
-  `  - Incluye el título exacto, el precio y el enlace.\n` +
-  `  - Tono directo, para desarrolladores. Sin markdown.\n` +
-  `  - No emojis.\n` +
-  `  - No sobre vendas, se honesto con lo que ofreces.\n` +
-  `  - Devuelve ÚNICAMENTE el anuncio, sin comillas ni explicaciones.`;
+    `Escribe el anuncio de lanzamiento de un curso para publicarlo en X.\n\n` +
+    `CURSO: ${COURSE.title}\n` +
+    `DURACIÓN: ${COURSE.hours} horas\n` +
+    `PRECIO: ${COURSE.priceUSD} USD\n` +
+    `ENLACE: ${COURSE.url}\n\n` +
+    `REQUISITOS:\n` +
+    `  - Máximo ${MAX_CHARS} caracteres, contando espacios y el enlace.\n` +
+    // `  - Trata de usar todo el espacio disponible.\n` +
+    `  - Usar al menos ${MAX_CHARS - 40} caracteres.\n` +
+    `  - Incluye el título exacto, el precio y el enlace.\n` +
+    `  - Tono directo, para desarrolladores. Sin markdown.\n` +
+    `  - No emojis.\n` +
+    `  - No sobre vendas, se honesto con lo que ofreces.\n` +
+    `  - Devuelve ÚNICAMENTE el anuncio, sin comillas ni explicaciones.`;
 
 // ---------------------------------------------------------------------------
 // EL GATE — Líneas que el modelo no puede replicar
@@ -70,24 +70,24 @@ const BRIEF =
 const MIN_CHARS = MAX_CHARS - 40;
 
 function lengthGate(text: string): string | undefined {
-  if (text.length > MAX_CHARS) {
-    return (
-      `El anuncio tiene ${text.length} caracteres. Te sobran ` +
-      `${text.length - MAX_CHARS}. Recórtalo a ${MAX_CHARS} o menos SIN ` +
-      `eliminar el título exacto, el precio ni el enlace.`
-    );
-  }
+    if (text.length > MAX_CHARS) {
+        return (
+            `El anuncio tiene ${text.length} caracteres. Te sobran ` +
+            `${text.length - MAX_CHARS}. Recórtalo a ${MAX_CHARS} o menos SIN ` +
+            `eliminar el título exacto, el precio ni el enlace.`
+        );
+    }
 
-  if (text.length < MIN_CHARS) {
-    return (
-      `El anuncio tiene ${text.length} caracteres y se queda corto: ` +
-      `te faltan ${MIN_CHARS - text.length} para el mínimo de ${MIN_CHARS}. ` +
-      `Amplíalo sin pasar de ${MAX_CHARS}: añade un beneficio concreto ` +
-      `del curso o menciona las ${COURSE.hours} horas.`
-    );
-  }
+    if (text.length < MIN_CHARS) {
+        return (
+            `El anuncio tiene ${text.length} caracteres y se queda corto: ` +
+            `te faltan ${MIN_CHARS - text.length} para el mínimo de ${MIN_CHARS}. ` +
+            `Amplíalo sin pasar de ${MAX_CHARS}: añade un beneficio concreto ` +
+            `del curso o menciona las ${COURSE.hours} horas.`
+        );
+    }
 
-  return undefined;
+    return undefined;
 }
 
 // ---------------------------------------------------------------------------
@@ -97,39 +97,39 @@ function lengthGate(text: string): string | undefined {
 type Check = { label: string; passed: boolean };
 
 function auditAnnouncement(text: string): Check[] {
-  return [
-    {
-      label: `≤ ${MAX_CHARS} caracteres (${text.length})`,
-      passed: text.length <= MAX_CHARS,
-    },
-    {
-      label: `Mínimo ${MAX_CHARS - 40} caracteres. Actual: ${text.length}. (falta: ${MAX_CHARS - 40 - text.length})`,
-      passed: text.length >= MAX_CHARS - 40,
-    },
-    { label: 'Título exacto', passed: text.includes(COURSE.title) },
-    { label: 'Precio', passed: /34[.,]99/.test(text) },
-    { label: 'Enlace', passed: text.includes(COURSE.url) },
-    { label: 'Sin markdown', passed: !/[#*_`]/.test(text) },
-    {
-      label: 'Sin emojis',
-      passed:
-        !/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/u.test(
-          text,
-        ),
-    },
-  ];
+    return [
+        {
+            label: `≤ ${MAX_CHARS} caracteres (${text.length})`,
+            passed: text.length <= MAX_CHARS,
+        },
+        {
+            label: `Mínimo ${MAX_CHARS - 40} caracteres. Actual: ${text.length}. (falta: ${MAX_CHARS - 40 - text.length})`,
+            passed: text.length >= MAX_CHARS - 40,
+        },
+        { label: 'Título exacto', passed: text.includes(COURSE.title) },
+        { label: 'Precio', passed: /34[.,]99/.test(text) },
+        { label: 'Enlace', passed: text.includes(COURSE.url) },
+        { label: 'Sin markdown', passed: !/[#*_`]/.test(text) },
+        {
+            label: 'Sin emojis',
+            passed:
+                !/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/u.test(
+                    text,
+                ),
+        },
+    ];
 }
 
 function printAudit(checks: Check[]) {
-  const passed = checks.filter((check) => check.passed).length;
+    const passed = checks.filter((check) => check.passed).length;
 
-  for (const check of checks) {
-    const mark = check.passed ? '✓'.green : '✗'.red;
-    console.log(`     ${mark} ${check.label}`);
-  }
-  console.log(`     → ${passed}/${checks.length} requisitos cumplidos`.blue);
+    for (const check of checks) {
+        const mark = check.passed ? '✓'.green : '✗'.red;
+        console.log(`     ${mark} ${check.label}`);
+    }
+    console.log(`     → ${passed}/${checks.length} requisitos cumplidos`.blue);
 
-  return passed;
+    return passed;
 }
 
 // ---------------------------------------------------------------------------
@@ -137,32 +137,40 @@ function printAudit(checks: Check[]) {
 // ---------------------------------------------------------------------------
 
 const WRITER_INSTRUCTIONS =
-  'Escribes anuncios cortos para redes sociales. Responde en español. ' +
-  'Devuelves solo el texto del anuncio, sin comillas, sin markdown, ' +
-  'sin explicar lo que hiciste.';
+    'Escribes anuncios cortos para redes sociales. Responde en español. ' +
+    'Devuelves solo el texto del anuncio, sin comillas, sin markdown, ' +
+    'sin explicar lo que hiciste.';
 
 /** Eslabón 1 — el borrador. */
 async function writeAnnouncement(tracer: ReturnType<typeof createTracer>) {
-  const { text } = await generateText({
-    model,
-    instructions: WRITER_INSTRUCTIONS,
-    prompt: BRIEF,
-    onStepEnd: tracer.onStepFinish
-  });
+    const { text } = await generateText({
+        model,
+        instructions: WRITER_INSTRUCTIONS,
+        prompt: BRIEF,
+        onStepEnd: tracer.onStepFinish
+    });
 
-  return text.trim();
+    return text.trim();
 }
 
 /** Eslabón 2 — el recorte. Recibe el veredicto del gate, no algo vago. */
 // Eventualmente lo puliremos para que sea más robusto y eficiente.
 async function updateAnnouncement(
-  text: string, // anuncio actual
-  feedback: string, // feedback del gate
-  tracer: ReturnType<typeof createTracer>,
+    text: string, // anuncio actual
+    feedback: string, // feedback del gate
+    tracer: ReturnType<typeof createTracer>,
 ) {
-  // TODO: implementar la función
 
-  return '';
+    const { text: newText } = await generateText({
+        model,
+        instructions: WRITER_INSTRUCTIONS,
+        prompt: `ANUNCIO ACTUAL: \n---${text}---` +
+            `\nPROBLEMA: \n${feedback} ---`,
+        // TODO: prevenir el degradado eventualmente
+        onStepEnd: tracer.onStepFinish
+    });
+
+    return newText.trim();
 }
 
 // ---------------------------------------------------------------------------
@@ -170,24 +178,24 @@ async function updateAnnouncement(
 // ---------------------------------------------------------------------------
 
 async function withoutChaining() {
-  console.log('\n═══ A) SIN CADENA ═══\n'.blue);
-  const tracer = createTracer('sin-cadena');
+    console.log('\n═══ A) SIN CADENA ═══\n'.blue);
+    const tracer = createTracer('sin-cadena');
 
-  const announcement = await writeAnnouncement(tracer);
-  console.log(announcement.green);
-  console.log(`\nLongitud real: ${ announcement.length } caracteres`);
+    const announcement = await writeAnnouncement(tracer);
+    console.log(announcement.green);
+    console.log(`\nLongitud real: ${announcement.length} caracteres`);
 
-  console.log(`\nAuditoria: `.blue);
-  const score = printAudit(auditAnnouncement(announcement));
-  
+    console.log(`\nAuditoria: `.blue);
+    const score = printAudit(auditAnnouncement(announcement));
 
-  console.log(
-    `\n     ⚠️ El requisito estaba en el prompt.
+
+    console.log(
+        `\n     ⚠️ El requisito estaba en el prompt.
       El modelo no puede cumplirlo de forma fiable porque no cuenta caracteres
       procesa tokens. Aquí no hay prompt que valga.`.yellow,
-  );
+    );
 
-  return { ...tracer.summary(), score, retries: 0 }; // score
+    return { ...tracer.summary(), score, retries: 0 }; // score
 }
 
 // ---------------------------------------------------------------------------
@@ -195,12 +203,45 @@ async function withoutChaining() {
 // ---------------------------------------------------------------------------
 
 async function withChaining() {
-  console.log('\n═══ B) CON CADENA ═══\n'.blue);
-  const tracer = createTracer('con-cadena');
+    console.log('\n═══ B) CON CADENA ═══\n'.blue);
+    const tracer = createTracer('con-cadena');
 
-  // TODO: implementar la lógica
+    let announcement = await writeAnnouncement(tracer);
+    let retries = 0;
 
-  return { ...tracer.summary() }; // score, retries
+    console.log(`Borrador: ${announcement.length} caracteres.`.purple);
+
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+        const feedback = lengthGate(announcement);
+
+        if (!feedback) {
+            console.log(` ✅ Gate superado en el intento ${attempt}`);
+            break;
+        }
+
+        console.log(`❌ ${feedback}`.yellow);
+
+        announcement = await updateAnnouncement(announcement, feedback, tracer);
+        retries++;
+        console.log(` Intento ${attempt}: ${announcement.length} caracteres.`.purple);
+
+    }
+
+    // Fallback determinista
+    if (lengthGate(announcement)) {
+        if (announcement.length > MAX_CHARS) {
+            announcement = `${announcement.slice(0, MAX_CHARS - 3)}...`;
+        }
+    }
+
+    console.log(`\n${announcement.green}`);
+    console.log(`\n   Longitud final: ${announcement.length} caracteres`);
+
+    console.log(`\n Auditoria: `.blue);
+    const score = printAudit(auditAnnouncement(announcement));
+
+
+    return { ...tracer.summary(), retries, score }; // score, retries
 }
 
 // ---------------------------------------------------------------------------
@@ -211,21 +252,21 @@ async function withChaining() {
 const SAFETY_LIMIT = 8;
 
 async function chainWithoutRetryLimit() {
-  console.log('\n═══ C) RIESGO: BUCLE SIN TOPE ═══\n'.blue);
-  const tracer = createTracer('sin-tope');
+    console.log('\n═══ C) RIESGO: BUCLE SIN TOPE ═══\n'.blue);
+    const tracer = createTracer('sin-tope');
 
-  // TODO: implementar la lógica
+    // TODO: implementar la lógica
 
-  console.log(
-    `\n\n
+    console.log(
+        `\n\n
   ⚠️  Mira la trayectoria. El modelo se acerca a la solución y se queda
       rondando: 4 → 3 → 2 → 1 → 1 → 1 → 2 → 1... 
       Cada iteración cuesta tokens.
       Sin tope, esto puede no terminar.
       Todo bucle necesita un techo Y una salida determinista.`.yellow,
-  );
+    );
 
-  return { ...tracer.summary() }; // score, retries, retries
+    return { ...tracer.summary() }; // score, retries, retries
 }
 
 // ---------------------------------------------------------------------------
@@ -233,22 +274,22 @@ async function chainWithoutRetryLimit() {
 // ---------------------------------------------------------------------------
 
 export async function promptChainingMain() {
-  const a = await withoutChaining();
-  // const b = await withChaining();
-  // const c = await chainWithoutRetryLimit();
+    //   const a = await withoutChaining();
+    const b = await withChaining();
+    // const c = await chainWithoutRetryLimit();
 
-  console.log('\n═══ COMPARATIVA ═══\n'.blue);
-  console.table({
-    'Sin cadena': a,
-    // 'Con cadena': b,
-    // 'Bucle sin tope': c,
-  });
+    console.log('\n═══ COMPARATIVA ═══\n'.blue);
+    console.table({
+        // 'Sin cadena': a,
+        'Con cadena': b,
+        // 'Bucle sin tope': c,
+    });
 
-  console.log(
-    '\n  El gate son unas pocas líneas de TypeScript y decide algo que el\n' +
-      '  modelo no puede decidir. Esa es toda la idea del patrón.\n\n' +
-      '  La cadena no mejora el anuncio: garantiza que cabe y es correcto.\n' +
-      '  "Mejor a veces" y "correcto siempre" no son lo mismo.\n\n' +
-      '  Y el eslabón que cierra el caso no es un prompt: es el slice.\n',
-  );
+    console.log(
+        '\n  El gate son unas pocas líneas de TypeScript y decide algo que el\n' +
+        '  modelo no puede decidir. Esa es toda la idea del patrón.\n\n' +
+        '  La cadena no mejora el anuncio: garantiza que cabe y es correcto.\n' +
+        '  "Mejor a veces" y "correcto siempre" no son lo mismo.\n\n' +
+        '  Y el eslabón que cierra el caso no es un prompt: es el slice.\n',
+    );
 }
