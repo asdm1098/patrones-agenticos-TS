@@ -143,9 +143,14 @@ const WRITER_INSTRUCTIONS =
 
 /** Eslabón 1 — el borrador. */
 async function writeAnnouncement(tracer: ReturnType<typeof createTracer>) {
-  // TODO: implementar la función
+  const { text } = await generateText({
+    model,
+    instructions: WRITER_INSTRUCTIONS,
+    prompt: BRIEF,
+    onStepEnd: tracer.onStepFinish
+  });
 
-  return '';
+  return text.trim();
 }
 
 /** Eslabón 2 — el recorte. Recibe el veredicto del gate, no algo vago. */
@@ -168,7 +173,13 @@ async function withoutChaining() {
   console.log('\n═══ A) SIN CADENA ═══\n'.blue);
   const tracer = createTracer('sin-cadena');
 
-  // TODO: implementar la lógica
+  const announcement = await writeAnnouncement(tracer);
+  console.log(announcement.green);
+  console.log(`\nLongitud real: ${ announcement.length } caracteres`);
+
+  console.log(`\nAuditoria: `.blue);
+  const score = printAudit(auditAnnouncement(announcement));
+  
 
   console.log(
     `\n     ⚠️ El requisito estaba en el prompt.
@@ -176,7 +187,7 @@ async function withoutChaining() {
       procesa tokens. Aquí no hay prompt que valga.`.yellow,
   );
 
-  return { ...tracer.summary(), retries: 0 }; // score
+  return { ...tracer.summary(), score, retries: 0 }; // score
 }
 
 // ---------------------------------------------------------------------------
