@@ -189,7 +189,6 @@ async function withoutChaining() {
     console.log(`\nAuditoria: `.blue);
     const score = printAudit(auditAnnouncement(announcement));
 
-
     console.log(
         `\n     ⚠️ El requisito estaba en el prompt.
       El modelo no puede cumplirlo de forma fiable porque no cuenta caracteres
@@ -256,7 +255,35 @@ async function chainWithoutRetryLimit() {
     console.log('\n═══ C) RIESGO: BUCLE SIN TOPE ═══\n'.blue);
     const tracer = createTracer('sin-tope');
 
-    // TODO: implementar la lógica
+    let announcement = await writeAnnouncement(tracer);
+    let retries = 0;
+    const history: number[] = [];
+    
+    let pendingChecks = auditAnnouncement(announcement).filter(
+        (check) => !check.passed
+    );
+
+    while( pendingChecks.length > 0 && retries < SAFETY_LIMIT ) {
+
+        const feedback = pendingChecks.map( check => check.label ).join('\n');
+        history.push(pendingChecks.length);
+
+        console.log({ feedback: `Problemas: \n ${feedback}`.purple });
+
+        announcement = await updateAnnouncement(announcement, feedback, tracer);
+
+        retries++;
+        console.log(` Intento: ${retries} \n ${announcement} ---`);
+        pendingChecks = auditAnnouncement(announcement).filter(
+            (check) => !check.passed
+        );
+
+    }
+
+    console.log(`\n Trayectoria: ${history.join(' → ').yellow} `);
+    console.log(` Auditoria: `.blue);
+    const score = printAudit(auditAnnouncement(announcement));
+    console.log(`Anuncio final:\n`.blue, announcement.green);
 
     console.log(
         `\n\n
@@ -267,7 +294,7 @@ async function chainWithoutRetryLimit() {
       Todo bucle necesita un techo Y una salida determinista.`.yellow,
     );
 
-    return { ...tracer.summary() }; // score, retries, retries
+    return { ...tracer.summary(), score, retries }; // score, retries, retries
 }
 
 // ---------------------------------------------------------------------------
@@ -276,14 +303,14 @@ async function chainWithoutRetryLimit() {
 
 export async function promptChainingMain() {
     //   const a = await withoutChaining();
-    const b = await withChaining();
-    // const c = await chainWithoutRetryLimit();
+    // const b = await withChaining();
+    const c = await chainWithoutRetryLimit();
 
     console.log('\n═══ COMPARATIVA ═══\n'.blue);
     console.table({
         // 'Sin cadena': a,
-        'Con cadena': b,
-        // 'Bucle sin tope': c,
+        // 'Con cadena': b,
+        'Bucle sin tope': c,
     });
 
     console.log(
