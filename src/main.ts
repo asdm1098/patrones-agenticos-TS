@@ -1,5 +1,6 @@
 import './helpers/string-colors.js';
-import { planAndExecuteMain } from './patterns/06-plan-and-execute/plan-execute.js';
+import { codeActMain } from './patterns/07-codeAct/code-act.js';
+// import { planAndExecuteMain } from './patterns/06-plan-and-execute/plan-execute.js';
 // import { promptChainingMain } from './patterns/05-prompt-chaining/prompt-chaining.js';
 // import { reActWeatherMain } from './patterns/04-reAct/reAct-tarea.js';
 // import { reActSimpleMain } from './patterns/04-reAct/reAct-loop.js';
@@ -19,4 +20,5 @@ console.clear();
 // await reActSimpleMain();
 // await reActWeatherMain();
 // await promptChainingMain();
-await planAndExecuteMain();
+// await planAndExecuteMain();
+await codeActMain();
