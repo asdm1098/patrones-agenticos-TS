@@ -217,14 +217,31 @@ async function withPlanAndExecute(task: string) {
   );
 
   // Fase 2: EJECUTAR — el código recorre el plan. Cero llamadas al modelo.
-  // TODO Ejecutar el plan
+  const results =  plan.steps.map(( step ) => ({
+    step: `${step.tool}(${step.villain})`,
+    result: executors[step.tool](step.villain), //si hay mas argumentos se envuelve [a,b,c...], se manda un arreglo de todos los argumentos posicionalmente
+  }))
 
-  // console.log('\n Ejecución completada sin consultar al modelo.'.yellow);
+  console.log({ results });
+
+  console.log('\n Ejecución completada sin consultar al modelo.'.yellow);
 
   // Fase 3: SINTETIZAR — una sola llamada con todos los resultados
-  // TODO: Implementar síntesis, aquí uniremos los resultados en un informe.
+  const { text } = await generateText({
+    model,
+    prompt:
+        `TAREA:\n${task}\n\n` +
+        `RESULTADOS:\n${JSON.stringify(results, null, 2)}`,
+    instructions:
+        'Redacta el informe usando ÚNICAMENTE los resultados proporcionados. ' +
+        'Si falta un dato, indícalo; no lo inventes. ',
+    onStepEnd: tracer.onStepFinish,
+  })
 
-  return { ...tracer.summary() }; // text
+  console.log('\n\n Informe:'.blue);
+  console.log(`\n${text}`.green);
+
+  return { ...tracer.summary(), text }; // text
 }
 
 // ---------------------------------------------------------------------------
