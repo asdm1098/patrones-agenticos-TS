@@ -175,7 +175,17 @@ async function withReAct(task: string) {
  * El plan es una lista de llamadas a herramientas con sus argumentos.
  * Zod garantiza que solo aparezcan herramientas que existen.
  */
-// TODO: Implementar schema de plan
+const planSchema = z.object({
+    steps: z.array(
+        z.object({
+            tool: z.enum(['getCellStatus', 'getGuardLog']),
+            villain: z.string(),
+            why: z.string().describe('Qué aporta este paso al informe'),
+        })
+    )
+    .min(1)
+    .max(12),
+})
 
 // Ejecutor: puro código, el modelo no participa.
 // La idea es tener las funciones de las herramientas disponibles para ejecutarlas.
@@ -189,13 +199,22 @@ async function withPlanAndExecute(task: string) {
   const tracer = createTracer('plan-and-execute');
 
   // Fase 1: PLANIFICAR — una sola llamada, sin herramientas
-  // TODO: Implementar planificación
+  const { output: plan } = await generateText({
+    model,
+    output: Output.object({ schema: planSchema }),
+    prompt: task,
+    instructions:
+        'Eres un oficial de control de prisión. NO resuelvas la tarea. ' +
+        'Lista todas las consultas necesarias para resolverla, en orden. ' +
+        'Herramientas disponibles: getCellStatus(villain), getGuardLog(villain) ',
+    onStepEnd: tracer.onStepFinish,
+  })
 
   // TODO: Aquí les dejo el console.log para observar el plan
-  // console.log(`\n Plan (${plan.steps.length} pasos):`.blue);
-  // plan.steps.forEach((step, i) =>
-  //   console.log(`   ${i + 1}. ${step.tool}(${step.villain}) — ${step.why}`),
-  // );
+  console.log(`\n Plan (${plan.steps.length} pasos):`.blue);
+  plan.steps.forEach((step, i) =>
+    console.log(`   ${i + 1}. ${step.tool}(${step.villain}) — ${step.why}`),
+  );
 
   // Fase 2: EJECUTAR — el código recorre el plan. Cero llamadas al modelo.
   // TODO Ejecutar el plan
@@ -248,8 +267,8 @@ function auditReport(text: string) {
 
 export async function planAndExecuteMain() {
   console.log('\n##### TAREA PREDECIBLE #####'.blue);
-  const a = await withReAct(PREDICTABLE_TASK);
-//   const b = await withPlanAndExecute(PREDICTABLE_TASK);
+//   const a = await withReAct(PREDICTABLE_TASK);
+  const b = await withPlanAndExecute(PREDICTABLE_TASK);
 
   // console.log('\n##### TAREA ADAPTATIVA #####'.blue);
   // const c = await withReAct(ADAPTIVE_TASK);
@@ -262,11 +281,11 @@ export async function planAndExecuteMain() {
 
   console.log('\n═══ COMPARATIVA ═══\n'.blue);
   console.table({
-    'ReAct (predecible)': { steps: a.steps, totalTokens: a.totalTokens },
-    // 'Plan-and-Execute (predecible)': {
-    //   steps: b.steps,
-    //   totalTokens: b.totalTokens,
-    // },
+    // 'ReAct (predecible)': { steps: a.steps, totalTokens: a.totalTokens },
+    'Plan-and-Execute (predecible)': {
+      steps: b.steps,
+      totalTokens: b.totalTokens,
+    },
     // 'ReAct (adaptativa)': {
     //   steps: c.steps,
     //   totalTokens: c.totalTokens,
