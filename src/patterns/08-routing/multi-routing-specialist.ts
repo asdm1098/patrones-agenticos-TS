@@ -24,34 +24,34 @@ import { createTracer, model } from '../../helpers/index.js';
 // ---------------------------------------------------------------------------
 
 const sendCatalog = tool({
-  description: 'Envía el catálogo de cursos y precios al cliente. Solo ventas.',
-  inputSchema: z.object({
-    interest: z.string().describe('Tema de interés, ej: "Flutter"'),
-  }),
-  execute: async ({ interest }) => ({ sent: true, interest }),
+    description: 'Envía el catálogo de cursos y precios al cliente. Solo ventas.',
+    inputSchema: z.object({
+        interest: z.string().describe('Tema de interés, ej: "Flutter"'),
+    }),
+    execute: async ({ interest }) => ({ sent: true, interest }),
 });
 
 const openTicket = tool({
-  description:
-    'Abre un ticket de soporte técnico por un problema de acceso o de plataforma.',
-  inputSchema: z.object({
-    issue: z.string(),
-  }),
-  execute: async ({ issue }) => ({
-    ticketId: `TK-${Math.floor(Math.random() * 9000 + 1000)}`,
-    issue,
-  }),
+    description:
+        'Abre un ticket de soporte técnico por un problema de acceso o de plataforma.',
+    inputSchema: z.object({
+        issue: z.string(),
+    }),
+    execute: async ({ issue }) => ({
+        ticketId: `TK-${Math.floor(Math.random() * 9000 + 1000)}`,
+        issue,
+    }),
 });
 
 const resendInvoice = tool({
-  description: 'Reenvía o corrige una factura de una compra. Solo facturación.',
-  inputSchema: z.object({
-    reason: z.string(),
-  }),
-  execute: async ({ reason }) => ({
-    invoiceId: `INV-${Math.floor(Math.random() * 9000 + 1000)}`,
-    reason,
-  }),
+    description: 'Reenvía o corrige una factura de una compra. Solo facturación.',
+    inputSchema: z.object({
+        reason: z.string(),
+    }),
+    execute: async ({ reason }) => ({
+        invoiceId: `INV-${Math.floor(Math.random() * 9000 + 1000)}`,
+        reason,
+    }),
 });
 
 // ---------------------------------------------------------------------------
@@ -59,31 +59,31 @@ const resendInvoice = tool({
 // ---------------------------------------------------------------------------
 
 const DEPARTMENTS = {
-  ventas: {
-    description: 'Cursos disponibles, precios, descuentos, promociones.',
-    instructions:
-      'Eres del departamento de ventas de DevTalles. Envía el catálogo con tu ' +
-      'herramienta y confirma en una frase. Responde en español.',
-    tools: { sendCatalog },
-    expectedTool: 'sendCatalog',
-  },
-  soporte: {
-    description:
-      'Problemas de acceso, videos que no cargan, errores de la plataforma.',
-    instructions:
-      'Eres del departamento de soporte técnico de DevTalles. Abre un ticket ' +
-      'con tu herramienta y devuelve su número. Responde en español.',
-    tools: { openTicket },
-    expectedTool: 'openTicket',
-  },
-  facturacion: {
-    description: 'Facturas, cobros duplicados, comprobantes de pago.',
-    instructions:
-      'Eres del departamento de facturación de DevTalles. Reenvía o corrige la ' +
-      'factura con tu herramienta y devuelve su identificador. Responde en español.',
-    tools: { resendInvoice },
-    expectedTool: 'resendInvoice',
-  },
+    ventas: {
+        description: 'Cursos disponibles, precios, descuentos, promociones.',
+        instructions:
+            'Eres del departamento de ventas de DevTalles. Envía el catálogo con tu ' +
+            'herramienta y confirma en una frase. Responde en español.',
+        tools: { sendCatalog },
+        expectedTool: 'sendCatalog',
+    },
+    soporte: {
+        description:
+            'Problemas de acceso, videos que no cargan, errores de la plataforma.',
+        instructions:
+            'Eres del departamento de soporte técnico de DevTalles. Abre un ticket ' +
+            'con tu herramienta y devuelve su número. Responde en español.',
+        tools: { openTicket },
+        expectedTool: 'openTicket',
+    },
+    facturacion: {
+        description: 'Facturas, cobros duplicados, comprobantes de pago.',
+        instructions:
+            'Eres del departamento de facturación de DevTalles. Reenvía o corrige la ' +
+            'factura con tu herramienta y devuelve su identificador. Responde en español.',
+        tools: { resendInvoice },
+        expectedTool: 'resendInvoice',
+    },
 } as const;
 
 type Department = keyof typeof DEPARTMENTS;
@@ -93,36 +93,36 @@ type Department = keyof typeof DEPARTMENTS;
 // ---------------------------------------------------------------------------
 
 const CALLS: { id: number; text: string; expected: Department }[] = [
-  {
-    id: 1,
-    text: 'Quiero saber qué cursos tienen de Flutter y cuánto cuestan.',
-    expected: 'ventas',
-  },
-  {
-    id: 2,
-    text: 'No puedo entrar a mi cuenta, dice contraseña incorrecta.',
-    expected: 'soporte',
-  },
-  {
-    id: 3,
-    text: 'Necesito la factura de mi compra de agosto para mi contador.',
-    expected: 'facturacion',
-  },
-  {
-    id: 4,
-    text: 'El video 14 del curso de NestJS no carga.',
-    expected: 'soporte',
-  },
-  {
-    id: 5,
-    text: '¿Hacen descuento para un equipo de 10 personas?',
-    expected: 'ventas',
-  },
-  {
-    id: 6,
-    text: 'Me cobraron dos veces el mismo curso.',
-    expected: 'facturacion',
-  },
+    {
+        id: 1,
+        text: 'Quiero saber qué cursos tienen de Flutter y cuánto cuestan.',
+        expected: 'ventas',
+    },
+    {
+        id: 2,
+        text: 'No puedo entrar a mi cuenta, dice contraseña incorrecta.',
+        expected: 'soporte',
+    },
+    {
+        id: 3,
+        text: 'Necesito la factura de mi compra de agosto para mi contador.',
+        expected: 'facturacion',
+    },
+    {
+        id: 4,
+        text: 'El video 14 del curso de NestJS no carga.',
+        expected: 'soporte',
+    },
+    {
+        id: 5,
+        text: '¿Hacen descuento para un equipo de 10 personas?',
+        expected: 'ventas',
+    },
+    {
+        id: 6,
+        text: 'Me cobraron dos veces el mismo curso.',
+        expected: 'facturacion',
+    },
 ];
 
 // ---------------------------------------------------------------------------
@@ -130,10 +130,10 @@ const CALLS: { id: number; text: string; expected: Department }[] = [
 // ---------------------------------------------------------------------------
 
 type Check = {
-  callId: number;
-  expected: Department;
-  routedTo: string;
-  toolsUsed: string[];
+    callId: number;
+    expected: Department;
+    routedTo: string;
+    toolsUsed: string[];
 };
 
 /**
@@ -142,27 +142,27 @@ type Check = {
  * disjuntas, una transferencia equivocada nunca puede pasar esta prueba.
  */
 function auditCalls(checks: Check[]) {
-  let passed = 0;
+    let passed = 0;
 
-  for (const check of checks) {
-    const ok = check.toolsUsed.includes(
-      DEPARTMENTS[check.expected].expectedTool,
-    );
-    if (ok) passed++;
+    for (const check of checks) {
+        const ok = check.toolsUsed.includes(
+            DEPARTMENTS[check.expected].expectedTool,
+        );
+        if (ok) passed++;
 
-    const mark = ok ? '✓'.green : '✗'.red;
-    console.log(
-      `     ${mark} llamada #${check.callId} → ${check.routedTo} ` +
-        `(esperado: ${check.expected}) · tools: [${check.toolsUsed.join(', ')}]`,
-    );
-  }
+        const mark = ok ? '✓'.green : '✗'.red;
+        console.log(
+            `     ${mark} llamada #${check.callId} → ${check.routedTo} ` +
+            `(esperado: ${check.expected}) · tools: [${check.toolsUsed.join(', ')}]`,
+        );
+    }
 
-  console.log(`     → ${passed}/${checks.length} llamadas resueltas`.blue);
-  return `${passed}/${checks.length}`;
+    console.log(`     → ${passed}/${checks.length} llamadas resueltas`.blue);
+    return `${passed}/${checks.length}`;
 }
 
 function toolNamesOf(steps: { toolCalls: { toolName: string }[] }[]) {
-  return steps.flatMap((step) => step.toolCalls.map((call) => call.toolName));
+    return steps.flatMap((step) => step.toolCalls.map((call) => call.toolName));
 }
 
 // ---------------------------------------------------------------------------
@@ -170,10 +170,10 @@ function toolNamesOf(steps: { toolCalls: { toolName: string }[] }[]) {
 // ---------------------------------------------------------------------------
 
 const GENERALIST_INSTRUCTIONS =
-  'Eres el único operador de la centralita de DevTalles. Atiendes cualquier llamada.\n' +
-  Object.values(DEPARTMENTS)
-    .map((department) => `- ${department.instructions}`)
-    .join('\n');
+    'Eres el único operador de la centralita de DevTalles. Atiendes cualquier llamada.\n' +
+    Object.values(DEPARTMENTS)
+        .map((department) => `- ${department.instructions}`)
+        .join('\n');
 /*
  * Ejemplo: 
   Eres el único operador de la centralita de DevTalles. Atiendes cualquier llamada.
@@ -185,15 +185,36 @@ const GENERALIST_INSTRUCTIONS =
 const ALL_TOOLS = { sendCatalog, openTicket, resendInvoice };
 
 async function withoutRouter() {
-  console.log('\n═══ A) SIN ROUTER (un solo operador) ═══\n'.blue);
-  const tracer = createTracer('sin-router');
-  const checks: Check[] = [];
+    console.log('\n═══ A) SIN ROUTER (un solo operador) ═══\n'.blue);
+    const tracer = createTracer('sin-router');
+    const checks: Check[] = [];
 
-  // TODO: Implementar un agente que atienda todas las llamadas con todas las herramientas.
+    for ( const call of CALLS ) {
+        console.log(`\n ☎️ Llamada #${call.id}: ${call.text}`.blue);
 
-  const accuracy = 'XXX';
+        const { text, steps } = await generateText({
+            model,
+            instructions: GENERALIST_INSTRUCTIONS,
+            prompt: call.text,
+            tools: ALL_TOOLS,
+            stopWhen: stepCountIs(3),
+            onStepEnd: tracer.onStepFinish,
+        });
 
-  return { ...tracer.summary(), accuracy };
+        console.log(`     Respuesta: ${text}`.green);
+        
+        checks.push({
+            callId: call.id,
+            expected: call.expected,
+            routedTo: toolNamesOf(steps)[0],
+            toolsUsed: toolNamesOf(steps),
+        });
+
+    }
+
+    const accuracy = auditCalls(checks);
+
+    return { ...tracer.summary(), accuracy };
 }
 
 // ---------------------------------------------------------------------------
@@ -204,67 +225,67 @@ async function withoutRouter() {
  * El router: prompt mínimo, salida estructurada, cero herramientas.
  */
 async function classify<T extends string>(
-  callText: string,
-  categories: Record<T, string>,
-  tracer: ReturnType<typeof createTracer>,
+    callText: string,
+    categories: Record<T, string>,
+    tracer: ReturnType<typeof createTracer>,
 ) {
-  const names = Object.keys(categories) as [T, ...T[]];
+    const names = Object.keys(categories) as [T, ...T[]];
 
-  // TODO: Implementar un agente que clasifique la llamada en un departamento.
-  const output = { department: 'XXX', reason: 'XXX' };
+    // TODO: Implementar un agente que clasifique la llamada en un departamento.
+    const output = { department: 'XXX', reason: 'XXX' };
 
-  return output;
+    return output;
 }
 
 async function withRouter() {
-  console.log('\n═══ B) CON ROUTER ═══\n'.blue);
-  const tracer = createTracer('con-router');
-  const checks: Check[] = [];
+    console.log('\n═══ B) CON ROUTER ═══\n'.blue);
+    const tracer = createTracer('con-router');
+    const checks: Check[] = [];
 
-  const categories: Record<Department, string> = Object.fromEntries(
-    Object.entries(DEPARTMENTS).map(([name, d]) => [name, d.description]),
-  ) as Record<Department, string>;
+    const categories: Record<Department, string> = Object.fromEntries(
+        Object.entries(DEPARTMENTS).map(([name, d]) => [name, d.description]),
+    ) as Record<Department, string>;
 
-  for (const call of CALLS) {
-    console.log(`\n ☎️ Llamada #${call.id}: ${call.text}`.blue);
+    for (const call of CALLS) {
+        console.log(`\n ☎️ Llamada #${call.id}: ${call.text}`.blue);
 
-    // 1. Clasificar (una sola vez)
-    // TODO: Clasificar la llamada
-    const decision = await classify(call.text, categories, tracer);
+        // 1. Clasificar (una sola vez)
+        // TODO: Clasificar la llamada
+        const decision = await classify(call.text, categories, tracer);
+        console.log(
+            `     Centralita → ${decision.department} · ${decision.reason}`.purple,
+        );
+
+        // 2. Transferir: el departamento solo ve SU instrucción y SU herramienta.
+        //    La centralita ya no participa.
+        //TODO: Transferir la llamada al departamento correspondiente.
+
+        const response = 'XXX';
+
+        // Agregar la respuesta a la auditoría.
+        checks.push({
+            callId: call.id,
+            expected: call.expected,
+            routedTo: decision.department,
+            toolsUsed: ['XXX'],
+        });
+    }
+
+    console.log('\n Auditoría:'.blue);
+    const accuracy = auditCalls(checks);
+
+    const longest = Math.max(
+        ...Object.values(DEPARTMENTS).map((d) => d.instructions.length),
+    );
     console.log(
-      `     Centralita → ${decision.department} · ${decision.reason}`.purple,
+        (
+            `\n  Cada llamada cargó como mucho ${longest} caracteres y 1 tool ` +
+            `(vs ${GENERALIST_INSTRUCTIONS.length} y 3 del operador único).\n` +
+            '  Con 30 departamentos, el coste por llamada NO cambia.'
+        ).yellow,
     );
 
-    // 2. Transferir: el departamento solo ve SU instrucción y SU herramienta.
-    //    La centralita ya no participa.
-    //TODO: Transferir la llamada al departamento correspondiente.
-
-    const response = 'XXX';
-
-    // Agregar la respuesta a la auditoría.
-    checks.push({
-      callId: call.id,
-      expected: call.expected,
-      routedTo: decision.department,
-      toolsUsed: ['XXX'],
-    });
-  }
-
-  console.log('\n Auditoría:'.blue);
-  const accuracy = auditCalls(checks);
-
-  const longest = Math.max(
-    ...Object.values(DEPARTMENTS).map((d) => d.instructions.length),
-  );
-  console.log(
-    (
-      `\n  Cada llamada cargó como mucho ${longest} caracteres y 1 tool ` +
-      `(vs ${GENERALIST_INSTRUCTIONS.length} y 3 del operador único).\n` +
-      '  Con 30 departamentos, el coste por llamada NO cambia.'
-    ).yellow,
-  );
-
-  return { ...tracer.summary(), accuracy };
+    return { ...tracer.summary(), accuracy };
 }
 
 // ---------------------------------------------------------------------------
@@ -272,21 +293,21 @@ async function withRouter() {
 // ---------------------------------------------------------------------------
 
 export async function routingMain() {
-  const a = await withoutRouter();
-  // const b = await withRouter();
+    const a = await withoutRouter();
+    // const b = await withRouter();
 
-  console.log('\n═══ COMPARATIVA ═══\n'.blue);
-  console.table({
-    'Sin router (operador único)': a,
-    // 'Con router': b,
-  });
+    console.log('\n═══ COMPARATIVA ═══\n'.blue);
+    console.table({
+        'Sin router (operador único)': a,
+        // 'Con router': b,
+    });
 
-  console.log(
-    '\n  El router cuesta una llamada extra, pero es diminuta.\n' +
-      '  Lo que compra es que cada departamento cargue solo su contexto y\n' +
-      '  su herramienta: el coste crece con el departamento, no con cuántos hay.\n\n' +
-      '  La centralita clasifica y transfiere UNA vez; no retiene el control.\n' +
-      '  Si hace falta coordinar varios departamentos o juntar sus respuestas,\n' +
-      '  eso ya es otro patrón: el orquestador multi-agente.\n',
-  );
+    console.log(
+        '\n  El router cuesta una llamada extra, pero es diminuta.\n' +
+        '  Lo que compra es que cada departamento cargue solo su contexto y\n' +
+        '  su herramienta: el coste crece con el departamento, no con cuántos hay.\n\n' +
+        '  La centralita clasifica y transfiere UNA vez; no retiene el control.\n' +
+        '  Si hace falta coordinar varios departamentos o juntar sus respuestas,\n' +
+        '  eso ya es otro patrón: el orquestador multi-agente.\n',
+    );
 }
