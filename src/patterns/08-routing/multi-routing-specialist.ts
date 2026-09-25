@@ -214,6 +214,14 @@ async function withoutRouter() {
 
     const accuracy = auditCalls(checks);
 
+    console.log(
+        (
+            '\n ⚠️ Puede acertar. Pero cada llamada cargó las instrucciones de los ' +
+            `3 departamentos (${GENERALIST_INSTRUCTIONS.length} caracteres) y las 3 tools. \n` +
+            '   con 30 departamentos, ese coste fijo se multiplica por 10.'
+        ).yellow
+    );
+
     return { ...tracer.summary(), accuracy };
 }
 
@@ -232,7 +240,22 @@ async function classify<T extends string>(
     const names = Object.keys(categories) as [T, ...T[]];
 
     // TODO: Implementar un agente que clasifique la llamada en un departamento.
-    const output = { department: 'XXX', reason: 'XXX' };
+    const { output } = await generateText({
+        model,
+        output: Output.object({
+            schema: z.object({
+                department: z.enum(names),
+                reason: z.string().describe('Una frase del por qué'),
+            }),
+        }),
+        instructions:
+            'Eres un centralista. Transfiere la llamada a UN solo departamento: \n' + 
+            Object.entries(categories)
+                .map(([name, description]) => ` - ${name}: ${description}`)
+                .join('\n'),
+        prompt: callText,
+        onStepEnd: tracer.onStepFinish,
+    });
 
     return output;
 }
@@ -259,15 +282,25 @@ async function withRouter() {
         // 2. Transferir: el departamento solo ve SU instrucción y SU herramienta.
         //    La centralita ya no participa.
         //TODO: Transferir la llamada al departamento correspondiente.
+        const department = DEPARTMENTS[decision.department];
 
-        const response = 'XXX';
+        const { text, steps } = await generateText({
+            model,
+            instructions: department.instructions,
+            prompt: call.text,
+            tools: department.tools,
+            stopWhen: stepCountIs(3),
+            onStepEnd: tracer.onStepFinish,
+        });
+
+        console.log(` Especialista Respuesta =>  ${text.trim()}`.green);
 
         // Agregar la respuesta a la auditoría.
         checks.push({
             callId: call.id,
             expected: call.expected,
             routedTo: decision.department,
-            toolsUsed: ['XXX'],
+            toolsUsed: toolNamesOf(steps),
         });
     }
 
@@ -293,13 +326,13 @@ async function withRouter() {
 // ---------------------------------------------------------------------------
 
 export async function routingMain() {
-    const a = await withoutRouter();
-    // const b = await withRouter();
+    // const a = await withoutRouter();
+    const b = await withRouter();
 
     console.log('\n═══ COMPARATIVA ═══\n'.blue);
     console.table({
-        'Sin router (operador único)': a,
-        // 'Con router': b,
+        // 'Sin router (operador único)': a,
+        'Con router': b,
     });
 
     console.log(
